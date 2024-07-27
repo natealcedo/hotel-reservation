@@ -1,7 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"github.com/gofiber/fiber/v2"
+	"net/http"
+)
+
+func handleRoot(c *fiber.Ctx) error {
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Hello, World!",
+	})
+
+}
 
 func main() {
-	fmt.Println("Hello, World!")
+	app := fiber.New()
+	app.Get("/", handleRoot)
+	err := app.Listen(":3000")
+
+	if err != nil {
+		panic(err)
+	}
 }

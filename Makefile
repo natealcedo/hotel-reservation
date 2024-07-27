@@ -1,7 +1,13 @@
-.PHONY: build clean test run install
+.PHONY: build clean test run install kill
 
 APP_NAME = app
 BIN = bin/$(APP_NAME)
+
+dev:
+	@pnpm pm2 start ecosystem.config.js --no-daemon
+
+kill:
+	@pnpm pm2 kill
 
 run: build
 	@./$(BIN)
