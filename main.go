@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/natealcedo/hotel-reservation/api"
 	"net/http"
 	"os"
 )
@@ -22,7 +23,8 @@ func main() {
 	app := fiber.New()
 	apiV1 := app.Group("/api/v1")
 
-	apiV1.Get("/hello", handleRoot)
+	apiV1.Get("/users/:id", api.HandleGetUserById)
+	apiV1.Get("/users", api.HandleGetUsers)
 
 	err := app.Listen(":" + port)
 
