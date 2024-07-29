@@ -2,35 +2,32 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/natealcedo/hotel-reservation/types"
+	"github.com/natealcedo/hotel-reservation/db"
 )
 
-func HandleGetUserById(c *fiber.Ctx) error {
-	u := &types.User{
-		ID:        "52fb62f9-4258-4624-857c-e2c51e0f3632",
-		FirstName: "John",
-		LastName:  "Doe",
-	}
-	return c.Status(fiber.StatusOK).JSON(u)
+type UserHandler struct {
+	userStore db.UserStore
 }
 
-func HandleGetUsers(c *fiber.Ctx) error {
-	users := &[]types.User{
-		{
-			ID:        "asdf123",
-			FirstName: "Nate",
-			LastName:  "Alcedo",
-		},
-		{
-			ID:        "asdf123",
-			FirstName: "Emmanuel",
-			LastName:  "Alcedo",
-		},
-		{
-			ID:        "asdf123",
-			FirstName: "Evelyn",
-			LastName:  "Fontentot",
-		},
+func NewUserHandler(userStore db.UserStore) *UserHandler {
+	return &UserHandler{
+		userStore: userStore,
 	}
-	return c.Status(fiber.StatusOK).JSON(users)
+}
+
+func (h *UserHandler) HandleGetUserById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	user, err := h.userStore.GetUserById(c.Context(), id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(user)
+}
+
+func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
+	users, err := h.userStore.GetUsers(c.Context())
+	if err != nil {
+		return err
+	}
+	return c.JSON(users)
 }
