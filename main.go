@@ -11,6 +11,13 @@ import (
 	"log"
 )
 
+var config = fiber.Config{
+	// Override default error handler
+	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+		return ctx.JSON(map[string]string{"error": err.Error()})
+	},
+}
+
 func main() {
 	listenAddr := flag.String("listenAddr", ":3000", "The address of the server")
 	flag.Parse()
@@ -23,7 +30,7 @@ func main() {
 	// handlers
 	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
 
-	app := fiber.New()
+	app := fiber.New(config)
 	apiV1 := app.Group("/api/v1")
 
 	apiV1.Get("/users/:id", userHandler.HandleGetUserById)
