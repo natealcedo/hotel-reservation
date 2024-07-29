@@ -34,9 +34,15 @@ func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) HandlePostUser(c *fiber.Ctx) error {
-	var params types.CreateUserParams
+	var params *types.CreateUserParams
 	if err := c.BodyParser(&params); err != nil {
 		return err
+	}
+
+	errors := params.Validate()
+
+	if len(errors) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
 	user, err := types.NewUserFromParams(params)

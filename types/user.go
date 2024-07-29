@@ -1,11 +1,18 @@
 package types
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"regexp"
 )
 
-const bcryptCost = 12
+const (
+	bcryptCost      = 12
+	minFirstNameLen = 2
+	minLastNameLen  = 2
+	minPasswordLen  = 7
+)
 
 type User struct {
 	ID                primitive.ObjectID `json:"id" bson:"_id,omitempty"`
@@ -22,7 +29,31 @@ type CreateUserParams struct {
 	Password  string `json:"password"`
 }
 
-func NewUserFromParams(params CreateUserParams) (*User, error) {
+func isValidEmail(email string) bool {
+	emailRegexPattern := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$`)
+	return emailRegexPattern.MatchString(email)
+}
+
+func (params CreateUserParams) Validate() map[string]string {
+	errors := make(map[string]string)
+	if len(params.FirstName) < minFirstNameLen {
+		errors["firstName"] = fmt.Sprintf("firstName length should be at least %d characters", minFirstNameLen)
+	}
+	if len(params.LastName) < minLastNameLen {
+		errors["lastName"] = fmt.Sprintf("lastName length should be at least %d characters", minLastNameLen)
+	}
+	if len(params.Password) < minPasswordLen {
+		errors["password"] = fmt.Sprintf("password length should be at least %d characters", minPasswordLen)
+	}
+
+	if !isValidEmail(params.Email) {
+		errors["email"] = "email address is not valid"
+	}
+
+	return errors
+}
+
+func NewUserFromParams(params *CreateUserParams) (*User, error) {
 	encryptedPw, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcryptCost)
 	if err != nil {
 		return nil, err
