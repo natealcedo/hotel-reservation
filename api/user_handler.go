@@ -44,10 +44,10 @@ func (h *UserHandler) HandlePostUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	errors := params.Validate()
+	errs := params.Validate()
 
-	if len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(errors)
+	if len(errs) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(errs)
 	}
 
 	user, err := types.NewUserFromParams(params)
