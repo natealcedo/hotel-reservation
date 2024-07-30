@@ -1,9 +1,11 @@
 package api
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserHandler struct {
@@ -19,9 +21,12 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 func (h *UserHandler) HandleGetUserById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user, err := h.userStore.GetUserById(c.Context(), id)
-	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	if err != nil || errors.Is(err, primitive.ErrInvalidHex) {
+		return c.JSON(fiber.Map{
+			"error": "not found",
+		})
 	}
+
 	return c.JSON(user)
 }
 
