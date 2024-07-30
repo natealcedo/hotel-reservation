@@ -15,7 +15,7 @@ type UserStore interface {
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
 	DeleteUserById(context.Context, string) error
-	UpdateUserById(context.Context, bson.M) error
+	UpdateUserById(context.Context, bson.M, bson.M) error
 }
 
 type MongoUserStore struct {
@@ -84,17 +84,10 @@ func (s *MongoUserStore) DeleteUserById(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *MongoUserStore) UpdateUserById(ctx context.Context, values bson.M) error {
-	//oid, err := primitive.ObjectIDFromHex(id)
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//// TODO: Maybe it's a good idea to handle if we did not delete any user
-	//// Maybe log it?
-	//if _, err := s.coll.DeleteOne(ctx, bson.M{"_id": oid}); err != nil {
-	//	return err
-	//}
-
+func (s *MongoUserStore) UpdateUserById(ctx context.Context, filter, update bson.M) error {
+	_, err := s.coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
 	return nil
 }
