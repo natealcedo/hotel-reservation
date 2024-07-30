@@ -185,3 +185,58 @@ func TestHandleGetUserById(t *testing.T) {
 		t.Errorf("expected %s but got %s", params.Email, user.Email)
 	}
 }
+
+func TestHandleDeleteUserById(t *testing.T) {
+	testingDb := setup(t)
+	defer testingDb.tearDown(t)
+
+	app := fiber.New()
+	userHandler := NewUserHandler(testingDb.UserStore)
+	app.Post("/", userHandler.HandlePostUser)
+	app.Get("/:id", userHandler.HandleGetUserById)
+	app.Delete("/:id", userHandler.HandleDeleteUserById)
+
+	params := types.CreateUserParams{
+		FirstName: "Nate",
+		LastName:  "Alcedo",
+		Email:     "natealcedo@gmail.com",
+		Password:  "randompassword",
+	}
+
+	b, _ := json.Marshal(params)
+
+	req := httptest.NewRequest("POST", "/", bytes.NewReader(b))
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := app.Test(req)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user := &types.User{}
+	_ = json.NewDecoder(resp.Body).Decode(&user)
+	userID := user.ID.Hex()
+
+	req = httptest.NewRequest("DELETE", "/"+userID, nil)
+	req.Header.Add("Content-Type", "application/json")
+	expected := fiber.StatusOK
+	actual := resp.StatusCode
+	resp, err = app.Test(req)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if expected != actual {
+		t.Errorf("expected %d but got %d", expected, actual)
+	}
+
+	var responseBody map[string]string
+	_ = json.NewDecoder(resp.Body).Decode(&responseBody)
+
+	expectedDeletedId := responseBody["deleted"]
+
+	if expectedDeletedId != userID {
+		t.Errorf("expected %s but got %s", userID, expectedDeletedId)
+	}
+}
