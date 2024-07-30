@@ -82,17 +82,20 @@ func (h *UserHandler) HandleDeleteUserById(c *fiber.Ctx) error {
 
 func (h *UserHandler) HandlePutUserById(c *fiber.Ctx) error {
 	var (
-		values bson.M
+		params *types.UpdateUserParams
 		userID = c.Params("id")
 	)
 	oid, err := primitive.ObjectIDFromHex(userID)
-	if err = c.BodyParser(&values); err != nil {
+	if err = c.BodyParser(&params); err != nil {
 		return err
 	}
 
+	if errs := params.Validate(); len(errs) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(errs)
+	}
+
 	filter := bson.M{"_id": oid}
-	update := bson.M{"$set": values}
-	if err := h.userStore.UpdateUserById(c.Context(), filter, update); err != nil {
+	if err := h.userStore.UpdateUserById(c.Context(), filter, params); err != nil {
 		return err
 	}
 	return c.JSON(fiber.Map{"updated": userID})

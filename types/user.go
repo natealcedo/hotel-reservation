@@ -29,9 +29,26 @@ type CreateUserParams struct {
 	Password  string `json:"password"`
 }
 
+type UpdateUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName" `
+}
+
 func isValidEmail(email string) bool {
 	emailRegexPattern := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$`)
 	return emailRegexPattern.MatchString(email)
+}
+
+func (params UpdateUserParams) Validate() map[string]string {
+	errors := make(map[string]string)
+	if len(params.FirstName) < minFirstNameLen {
+		errors["firstName"] = fmt.Sprintf("firstName length should be at least %d characters", minFirstNameLen)
+	}
+	if len(params.LastName) < minLastNameLen {
+		errors["lastName"] = fmt.Sprintf("lastName length should be at least %d characters", minLastNameLen)
+	}
+
+	return errors
 }
 
 func (params CreateUserParams) Validate() map[string]string {
