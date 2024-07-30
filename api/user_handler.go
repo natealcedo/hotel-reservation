@@ -79,11 +79,12 @@ func (h *UserHandler) HandleDeleteUserById(c *fiber.Ctx) error {
 	})
 }
 
-//func (h *UserHandler) HandlePutUser(c *fiber.Ctx) error {
-//	id := c.Params("id")
-//	err := h.userStore.DeleteUser(c.Context(), id)
-//	if err != nil {
-//		return fiber.NewError(fiber.StatusNotFound, err.Error())
-//	}
-//	return c.SendStatus(fiber.StatusNoContent)
-//}
+func (h *UserHandler) HandlePutUserById(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	//id := c.Params("id")
+	//err := h.userStore.DeleteUser(c.Context(), id)
+	//if err != nil {
+	//	return fiber.NewError(fiber.StatusNotFound, err.Error())
+	//}
+	//return c.SendStatus(fiber.StatusNoContent)
+}
