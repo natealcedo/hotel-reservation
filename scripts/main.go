@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -23,6 +23,7 @@ func main() {
 	hotel := &types.Hotel{
 		Name:     "Hotel California",
 		Location: "California",
+		Rooms:    []primitive.ObjectID{},
 	}
 
 	insertedHotel, err := hotelStore.InsertHotel(ctx, hotel)
@@ -51,7 +52,7 @@ func main() {
 		},
 	}
 
-	insertedRooms := []*types.Room{}
+	var insertedRooms []*types.Room
 
 	for _, room := range rooms {
 		room, err := roomStore.InsertRoom(ctx, room)
@@ -61,8 +62,5 @@ func main() {
 		insertedRooms = append(insertedRooms, room)
 
 	}
-
-	fmt.Println(insertedHotel)
-	fmt.Println(insertedRooms)
 
 }
