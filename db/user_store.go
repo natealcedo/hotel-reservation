@@ -51,7 +51,6 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
 	cursor, err := s.coll.Find(ctx, bson.M{})
-	defer cursor.Close(ctx)
 	if err != nil {
 		return nil, err
 	}
