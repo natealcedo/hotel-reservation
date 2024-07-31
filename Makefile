@@ -23,3 +23,6 @@ lint:
 		gofmt -d .; \
 		exit 1; \
 	fi
+
+seed:
+	@go run scripts/main.go
