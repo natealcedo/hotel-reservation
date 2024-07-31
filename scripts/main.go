@@ -31,18 +31,38 @@ func main() {
 		log.Fatal(err)
 	}
 
-	room := &types.Room{
-		HotelID:   insertedHotel.ID,
-		Type:      types.SingleRoomType,
-		BasePrice: 99.9,
+	rooms := []*types.Room{
+		{
+			HotelID:   insertedHotel.ID,
+			Type:      types.SingleRoomType,
+			BasePrice: 99.9,
+		},
+		{
+
+			HotelID:   insertedHotel.ID,
+			Type:      types.DeluxeRoomType,
+			BasePrice: 199.9,
+		},
+		{
+
+			HotelID:   insertedHotel.ID,
+			Type:      types.SeasideRoomType,
+			BasePrice: 122.9,
+		},
 	}
 
-	insertedRoom, err := roomStore.InsertRoom(ctx, room)
-	if err != nil {
-		log.Fatal(err)
+	insertedRooms := []*types.Room{}
+
+	for _, room := range rooms {
+		room, err := roomStore.InsertRoom(ctx, room)
+		if err != nil {
+			log.Fatal(err)
+		}
+		insertedRooms = append(insertedRooms, room)
+
 	}
 
 	fmt.Println(insertedHotel)
-	fmt.Println(insertedRoom)
+	fmt.Println(insertedRooms)
 
 }

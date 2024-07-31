@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/natealcedo/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -14,6 +15,7 @@ type HotelStore interface {
 	Dropper
 
 	InsertHotel(context.Context, *types.Hotel) (*types.Hotel, error)
+	UpdateHotel(context.Context, bson.M, bson.M) error
 }
 
 type MongoHotelStore struct {
@@ -42,4 +44,9 @@ func (s *MongoHotelStore) InsertHotel(ctx context.Context, hotel *types.Hotel) (
 func (s *MongoHotelStore) Drop(ctx context.Context) error {
 	fmt.Printf("---- Dropping %s collection ----\n", s.coll.Name())
 	return s.coll.Drop(ctx)
+}
+
+func (s *MongoUserStore) UpdateHotel(ctx context.Context, filter, update bson.M) error {
+	_, err := s.coll.UpdateOne(ctx, filter, update)
+	return err
 }
