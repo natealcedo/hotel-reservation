@@ -20,6 +20,17 @@ func main() {
 	hotelStore := db.NewMongoHotelStore(client)
 	roomStore := db.NewMongoRoomStore(client, hotelStore)
 
+	// Drop collections first to avoid duplicates when running seed
+	err = hotelStore.Drop(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = roomStore.Drop(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	hotel := &types.Hotel{
 		Name:     "Hotel California",
 		Location: "California",
