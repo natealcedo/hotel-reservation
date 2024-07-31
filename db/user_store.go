@@ -9,8 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const userColl = "users"
-
 type Dropper interface {
 	Drop(context.Context) error
 }
@@ -33,7 +31,7 @@ type MongoUserStore struct {
 func NewMongoUserStore(client *mongo.Client, dbName string) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
-		coll:   client.Database(dbName).Collection(userColl),
+		coll:   client.Database(dbName).Collection("users"),
 	}
 }
 

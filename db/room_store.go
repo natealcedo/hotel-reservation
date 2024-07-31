@@ -9,8 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const roomColl = "rooms"
-
 type RoomStore interface {
 	Dropper
 
@@ -20,12 +18,14 @@ type RoomStore interface {
 type MongoRoomStore struct {
 	client *mongo.Client
 	coll   *mongo.Collection
+
+	HotelStore
 }
 
 func NewMongoRoomStore(client *mongo.Client, dbName string) *MongoRoomStore {
 	return &MongoRoomStore{
 		client: client,
-		coll:   client.Database(dbName).Collection(roomColl),
+		coll:   client.Database(dbName).Collection("rooms"),
 	}
 }
 
