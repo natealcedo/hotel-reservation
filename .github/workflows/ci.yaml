@@ -36,5 +36,8 @@ jobs:
       - name: Install dependencies
         run: make install
 
+      - name: Lint codebase
+        run: make lint
+
       - name: Run tests
         run: make test
