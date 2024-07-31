@@ -28,11 +28,12 @@ func main() {
 	}
 
 	// handlers
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
 
 	app := fiber.New(config)
 	apiV1 := app.Group("/api/v1")
 
+	// Users
 	apiV1.Get("/users/:id", userHandler.HandleGetUserById)
 	apiV1.Get("/users", userHandler.HandleGetUsers)
 	apiV1.Post("/users", userHandler.HandlePostUser)
