@@ -13,8 +13,6 @@ import (
 	"testing"
 )
 
-const testDBName = "test-hotel-reservation"
-
 type testDb struct {
 	db.UserStore
 }
@@ -28,7 +26,7 @@ func setup(t *testing.T) *testDb {
 	}
 
 	return &testDb{
-		UserStore: db.NewMongoUserStore(client, testDBName),
+		UserStore: db.NewMongoUserStore(client, db.TESTDBNAME),
 	}
 
 }
