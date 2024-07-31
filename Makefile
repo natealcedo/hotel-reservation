@@ -1,4 +1,4 @@
-.PHONY: build clean test run install kill
+.PHONY: build clean test run install lint
 
 APP_NAME = app
 BIN = bin/$(APP_NAME)
@@ -17,3 +17,9 @@ clean:
 
 test:
 	@go test -v ./... -count=1 # -count=1 to avoid caching
+
+lint:
+	@if gofmt -l . | read; then \
+		gofmt -d .; \
+		exit 1; \
+	fi
