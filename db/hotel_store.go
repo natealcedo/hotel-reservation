@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,4 +37,9 @@ func (s *MongoHotelStore) InsertHotel(ctx context.Context, hotel *types.Hotel) (
 
 	hotel.ID = resp.InsertedID.(primitive.ObjectID)
 	return hotel, nil
+}
+
+func (s *MongoHotelStore) Drop(ctx context.Context) error {
+	fmt.Printf("---- Dropping %s collection ----\n", s.coll.Name())
+	return s.coll.Drop(ctx)
 }
