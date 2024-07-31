@@ -10,15 +10,63 @@ import (
 	"log"
 )
 
+var (
+	roomStore  *db.MongoRoomStore
+	hotelStore *db.MongoHotelStore
+	ctx        = context.Background()
+)
+
+func seedHotel(name, location string) {
+	hotel := &types.Hotel{
+		Name:     name,
+		Location: location,
+		Rooms:    []primitive.ObjectID{},
+	}
+
+	rooms := []*types.Room{
+		{
+			Type:      types.SingleRoomType,
+			BasePrice: 99.9,
+		},
+		{
+
+			Type:      types.DeluxeRoomType,
+			BasePrice: 199.9,
+		},
+		{
+
+			Type:      types.SeasideRoomType,
+			BasePrice: 122.9,
+		},
+	}
+	insertedHotel, err := hotelStore.InsertHotel(ctx, hotel)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, room := range rooms {
+		room.HotelID = insertedHotel.ID
+		_, err := roomStore.InsertRoom(ctx, room)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func main() {
-	ctx := context.Background()
+	seedHotel("Bellucia", "France")
+	seedHotel("The cozy hotel", "Netherlands")
+	seedHotel("Don't die in your sleep", "London")
+}
+
+func init() {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(db.DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	hotelStore := db.NewMongoHotelStore(client)
-	roomStore := db.NewMongoRoomStore(client, hotelStore)
+	hotelStore = db.NewMongoHotelStore(client)
+	roomStore = db.NewMongoRoomStore(client, hotelStore)
 
 	// Drop collections first to avoid duplicates when running seed
 	err = hotelStore.Drop(ctx)
@@ -30,48 +78,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	hotel := &types.Hotel{
-		Name:     "Hotel California",
-		Location: "California",
-		Rooms:    []primitive.ObjectID{},
-	}
-
-	insertedHotel, err := hotelStore.InsertHotel(ctx, hotel)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	rooms := []*types.Room{
-		{
-			HotelID:   insertedHotel.ID,
-			Type:      types.SingleRoomType,
-			BasePrice: 99.9,
-		},
-		{
-
-			HotelID:   insertedHotel.ID,
-			Type:      types.DeluxeRoomType,
-			BasePrice: 199.9,
-		},
-		{
-
-			HotelID:   insertedHotel.ID,
-			Type:      types.SeasideRoomType,
-			BasePrice: 122.9,
-		},
-	}
-
-	var insertedRooms []*types.Room
-
-	for _, room := range rooms {
-		room, err := roomStore.InsertRoom(ctx, room)
-		if err != nil {
-			log.Fatal(err)
-		}
-		insertedRooms = append(insertedRooms, room)
-
-	}
-
 }
