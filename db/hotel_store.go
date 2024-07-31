@@ -21,10 +21,10 @@ type MongoHotelStore struct {
 	coll   *mongo.Collection
 }
 
-func NewMongoHotelStore(client *mongo.Client, dbName string) *MongoHotelStore {
+func NewMongoHotelStore(client *mongo.Client) *MongoHotelStore {
 	return &MongoHotelStore{
 		client: client,
-		coll:   client.Database(dbName).Collection("hotels"),
+		coll:   client.Database(DBNAME).Collection("hotels"),
 	}
 }
 
@@ -44,7 +44,7 @@ func (s *MongoHotelStore) Drop(ctx context.Context) error {
 	return s.coll.Drop(ctx)
 }
 
-func (s *MongoUserStore) UpdateHotel(ctx context.Context, filter, update bson.M) error {
+func (s *MongoHotelStore) UpdateHotel(ctx context.Context, filter, update bson.M) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err
 }
