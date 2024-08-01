@@ -27,10 +27,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	store := &db.Store{
+		User:  db.NewMongoUserStore(client),
+		Hotel: db.NewMongoHotelStore(client),
+		Room:  db.NewMongoRoomStore(client, db.NewMongoHotelStore(client)),
+	}
+
 	// handlers
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
-	hotelStore := db.NewMongoHotelStore(client)
-	hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(client), db.NewMongoRoomStore(client, hotelStore))
+	userHandler := api.NewUserHandler(store.User)
+	hotelHandler := api.NewHotelHandler(store)
 
 	app := fiber.New(config)
 	apiV1 := app.Group("/api/v1")
