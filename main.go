@@ -44,6 +44,7 @@ func main() {
 
 	// Hotels
 	apiV1.Get("/hotels", hotelHandler.HandleGetHotels)
+	apiV1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
 
 	err = app.Listen(*listenAddr)
 
