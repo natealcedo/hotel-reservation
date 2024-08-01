@@ -3,8 +3,8 @@
 APP_NAME = app
 BIN = bin/$(APP_NAME)
 
-run: build
-	@./$(BIN)
+run:
+	@air
 
 install:
 	@go mod tidy
