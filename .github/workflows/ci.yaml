@@ -9,7 +9,30 @@ on:
       - main
 
 jobs:
-  build:
+  lint-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.5'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Lint codebase
+        run: |
+          if gofmt -l .| read; then \
+            echo "Linting failed"; \
+            exit 1; \
+          fi
+
+  test:
+    needs:
+        - lint-code
     runs-on: ubuntu-latest
 
     services:
@@ -35,13 +58,5 @@ jobs:
 
       - name: Install dependencies
         run: go mod tidy
-
-      - name: Lint codebase
-        run: | 
-          if gofmt -l .| read; then \
-            echo "Linting failed"; \
-            exit 1; \
-          fi
-
       - name: Run tests
         run: go test -v ./...
