@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AuthParams struct {
@@ -32,9 +34,12 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	user, err := h.store.User.GetUserByEmail(c.Context(), authParams.Email)
 
 	if err != nil {
-		return c.JSON(fiber.Map{
-			"error": "user not found",
-		})
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return c.JSON(fiber.Map{
+				"error": "invalid credentials",
+			})
+		}
+		return err
 	}
 
 	return c.JSON(user)
