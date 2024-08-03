@@ -34,12 +34,17 @@ func main() {
 		Room:  db.NewMongoRoomStore(client, db.NewMongoHotelStore(client)),
 	}
 
+	app := fiber.New(config)
+	auth := app.Group("/api")
+	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication)
+
 	// handlers
 	userHandler := api.NewUserHandler(store.User)
 	hotelHandler := api.NewHotelHandler(store)
+	authHandler := api.NewAuthHandler(store)
 
-	app := fiber.New(config)
-	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication)
+	// Auth
+	auth.Post("/auth", authHandler.HandleAuthenticate)
 
 	// Users
 	apiV1.Get("/users/:id", userHandler.HandleGetUserById)
