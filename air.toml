@@ -17,3 +17,6 @@ timestamp = true # Enable timestamp in logs
 delay = 200 # Delay in milliseconds before reloading
 force_polling = false # Force polling for file changes
 poll_interval = 1000 # Polling interval in milliseconds
+
+[env]
+file = ".env"
