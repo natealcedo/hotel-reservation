@@ -13,8 +13,29 @@ import (
 var (
 	roomStore  *db.MongoRoomStore
 	hotelStore *db.MongoHotelStore
+	userStore  *db.MongoUserStore
 	ctx        = context.Background()
 )
+
+func seedUser(first, last, email string) {
+	user, err := types.NewUserFromParams(&types.CreateUserParams{
+		FirstName: first,
+		LastName:  last,
+		Email:     email,
+		Password:  "supersecurepassword",
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = userStore.InsertUser(ctx, user)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
 
 func seedHotel(name, location string, rating int) {
 	hotel := &types.Hotel{
@@ -58,6 +79,9 @@ func main() {
 	seedHotel("Bellucia", "France", 5)
 	seedHotel("The cozy hotel", "Netherlands", 4)
 	seedHotel("Don't die in your sleep", "London", 3)
+	seedUser("Nate", "Alcedo", "natealcedo@gmail.com")
+	seedUser("Lebron", "James", "lebron@gmail.com")
+	seedUser("Bronny", "James", "bronny@gmail.com")
 }
 
 func init() {
@@ -68,6 +92,7 @@ func init() {
 
 	hotelStore = db.NewMongoHotelStore(client)
 	roomStore = db.NewMongoRoomStore(client, hotelStore)
+	userStore = db.NewMongoUserStore(client)
 
 	// Drop collections first to avoid duplicates when running seed
 	err = hotelStore.Drop(ctx)
@@ -76,6 +101,11 @@ func init() {
 	}
 
 	err = roomStore.Drop(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = userStore.Drop(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
