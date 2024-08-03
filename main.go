@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/api"
 	"github.com/natealcedo/hotel-reservation/db"
+	"github.com/natealcedo/hotel-reservation/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -38,7 +39,7 @@ func main() {
 	hotelHandler := api.NewHotelHandler(store)
 
 	app := fiber.New(config)
-	apiV1 := app.Group("/api/v1")
+	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication)
 
 	// Users
 	apiV1.Get("/users/:id", userHandler.HandleGetUserById)
