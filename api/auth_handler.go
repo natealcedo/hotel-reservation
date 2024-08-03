@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthParams struct {
@@ -40,6 +41,12 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 			})
 		}
 		return err
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(authParams.Password)); err != nil {
+		return c.JSON(fiber.Map{
+			"error": "invalid credentials",
+		})
 	}
 
 	return c.JSON(user)
