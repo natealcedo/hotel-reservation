@@ -21,6 +21,7 @@ func JWTAuthentication(c *fiber.Ctx) error {
 	}
 
 	// Check token expiration
+	// Refactor this to have proper time expiration handling
 	expiresStr, ok := claims["expires"].(string)
 	if !ok {
 		return fmt.Errorf("unauthorized")
