@@ -33,11 +33,7 @@ func JWTAuthentication(c *fiber.Ctx) error {
 		return fmt.Errorf("token expired")
 	}
 
-	if err := c.Next(); err != nil {
-		return err
-	}
-
-	return nil
+	return c.Next()
 }
 
 func validateToken(tokenStr string) (jwt.MapClaims, error) {
