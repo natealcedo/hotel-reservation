@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
+	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthParams struct {
@@ -23,6 +23,12 @@ func NewAuthHandler(store *db.Store) *AuthHandler {
 	}
 }
 
+// A handler should ony do: -> Comparable to a MVC pattern. The handler is the controller. We're prolly gonna
+// need a business service layer
+// - serialization/deserialization from request/response
+// - do some data fetching
+// - call some business logic
+// - return the data back to the client
 func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	// When using body parser, the variable has to be a struct, not a pointer to a struct
 	// When passing the variable to c.BodyParser, it has to be a pointer to the variable
@@ -43,7 +49,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(authParams.Password)); err != nil {
+	if !types.IsValidPassword(user.EncryptedPassword, authParams.Password) {
 		return c.JSON(fiber.Map{
 			"error": "invalid credentials",
 		})
