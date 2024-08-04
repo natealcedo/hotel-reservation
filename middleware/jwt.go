@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
+	"time"
 )
 
 func JWTAuthentication(c *fiber.Ctx) error {
@@ -13,9 +14,23 @@ func JWTAuthentication(c *fiber.Ctx) error {
 		return fmt.Errorf("unauthorized")
 	}
 
-	if err := parseToken(token[0]); err != nil {
+	claims, err := validateToken(token[0])
+	if err != nil {
 		fmt.Println("error parsing token", err)
 		return fmt.Errorf("unauthorized")
+	}
+
+	// Check token expiration
+	expiresStr, ok := claims["expires"].(string)
+	if !ok {
+		return fmt.Errorf("unauthorized")
+	}
+	expires, err := time.Parse(time.RFC3339, expiresStr)
+	if err != nil {
+		return fmt.Errorf("unauthorized")
+	}
+	if time.Now().After(expires) {
+		return fmt.Errorf("token expired")
 	}
 
 	if err := c.Next(); err != nil {
@@ -23,10 +38,9 @@ func JWTAuthentication(c *fiber.Ctx) error {
 	}
 
 	return nil
-
 }
 
-func parseToken(tokenStr string) error {
+func validateToken(tokenStr string) (jwt.MapClaims, error) {
 	unauthorized := fmt.Errorf("unauthorized")
 	parsedToken, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		// Don't forget to validate the alg is what you expect:
@@ -41,14 +55,19 @@ func parseToken(tokenStr string) error {
 
 	if err != nil {
 		fmt.Println(err)
-		return unauthorized
+		return nil, unauthorized
 	}
 
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		fmt.Println(claims)
-	} else {
-		fmt.Println(err)
+	if !parsedToken.Valid {
+		fmt.Println("invalid token")
+		return nil, unauthorized
 	}
 
-	return unauthorized
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		fmt.Println("invalid claims")
+		return nil, unauthorized
+	}
+
+	return claims, nil
 }
