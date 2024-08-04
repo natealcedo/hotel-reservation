@@ -2,15 +2,24 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
+	"time"
 )
 
 type AuthParams struct {
 	Email    string `json:"email" `
 	Password string `json:"password" `
+}
+
+type AuthResponse struct {
+	User  *types.User `json:"user"`
+	Token string      `json:"token"`
 }
 
 type AuthHandler struct {
@@ -55,5 +64,28 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	resp := &AuthResponse{
+		User:  user,
+		Token: createTokenFromUser(user),
+	}
+
+	return c.JSON(resp)
+}
+
+func createTokenFromUser(user *types.User) string {
+	now := time.Now()
+	expires := now.Add(time.Hour * 4)
+	claims := jwt.MapClaims{
+		"id":      user.ID,
+		"email":   user.Email,
+		"expires": expires,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret := os.Getenv("JWT_SECRET")
+	tokenStr, err := token.SignedString([]byte(secret))
+	if err != nil {
+		fmt.Println("error signing token", err)
+	}
+	return tokenStr
 }

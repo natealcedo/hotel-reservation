@@ -14,7 +14,7 @@ func JWTAuthentication(c *fiber.Ctx) error {
 		return fmt.Errorf("unauthorized")
 	}
 
-	claims, err := validateToken(token[0c])
+	claims, err := validateToken(token[0])
 	if err != nil {
 		fmt.Println("error parsing token", err)
 		return fmt.Errorf("unauthorized")
