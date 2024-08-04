@@ -3,8 +3,11 @@
 APP_NAME = app
 BIN = bin/$(APP_NAME)
 
+include .env
+export $(shell sed 's/=.*//' .env)
+
 run:
-	@air
+	@go run main.go
 
 install:
 	@go mod tidy
