@@ -78,5 +78,50 @@ func TestHandleAuthenticate(t *testing.T) {
 	if !reflect.DeepEqual(authResponse.User, insertedUser) {
 		t.Errorf("expected %v but got %v", insertedUser, authResponse.User)
 	}
+}
+
+func TestHandleAuthenticateFailure(t *testing.T) {
+	tdb := setup(t)
+	defer tdb.tearDown(t)
+	insertTestUser(t, tdb.UserStore)
+
+	app := fiber.New()
+	authHandler := NewAuthHandler(tdb.UserStore)
+	app.Post("/auth", authHandler.HandleAuthenticate)
+
+	params := AuthParams{
+		Email:    "natealcedo@gmail.com",
+		Password: "wrong password",
+	}
+
+	b, _ := json.Marshal(params)
+
+	req := httptest.NewRequest("POST", "/auth", bytes.NewReader(b))
+	req.Header.Add("Content-Type", "application/json")
+	res, err := app.Test(req)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fiber.StatusUnauthorized
+	actual := res.StatusCode
+
+	if expected != actual {
+		t.Errorf("expected %v but got %v", expected, actual)
+	}
+
+	var genResp genericResponse
+	if err := json.NewDecoder(res.Body).Decode(&genResp); err != nil {
+		t.Fatal(err)
+	}
+
+	if genResp.Type != "error" {
+		t.Fatalf("expected %v but got %v", "error", genResp.Type)
+	}
+
+	if genResp.Msg != invalidCredentialsMsg {
+		t.Fatalf("expected %v but got %v", invalidCredentialsMsg, genResp.Msg)
+	}
 
 }
