@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const invalidCredentialsMsg = "invalid credentials"
+
 type AuthParams struct {
 	Email    string `json:"email" `
 	Password string `json:"password" `
@@ -30,6 +32,19 @@ func NewAuthHandler(store db.UserStore) *AuthHandler {
 	return &AuthHandler{
 		userStore: store,
 	}
+}
+
+type genericResponse struct {
+	Type string `json:"type"`
+	Msg  string `json:"msg"`
+}
+
+func invalidCredentials(c *fiber.Ctx) error {
+	return c.Status(401).JSON(
+		genericResponse{
+			Type: "error",
+			Msg:  invalidCredentialsMsg,
+		})
 }
 
 // A handler should ony do: -> Comparable to a MVC pattern. The handler is the controller. We're prolly gonna
@@ -51,17 +66,13 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return c.JSON(fiber.Map{
-				"error": "invalid credentials",
-			})
+			return invalidCredentials(c)
 		}
 		return err
 	}
 
 	if !types.IsValidPassword(user.EncryptedPassword, authParams.Password) {
-		return c.JSON(fiber.Map{
-			"error": "invalid credentials",
-		})
+		return invalidCredentials(c)
 	}
 
 	resp := &AuthResponse{
