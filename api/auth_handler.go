@@ -23,12 +23,12 @@ type AuthResponse struct {
 }
 
 type AuthHandler struct {
-	store *db.Store
+	userStore db.UserStore
 }
 
-func NewAuthHandler(store *db.Store) *AuthHandler {
+func NewAuthHandler(store db.UserStore) *AuthHandler {
 	return &AuthHandler{
-		store: store,
+		userStore: store,
 	}
 }
 
@@ -47,7 +47,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		return err
 	}
 
-	user, err := h.store.User.GetUserByEmail(c.Context(), authParams.Email)
+	user, err := h.userStore.GetUserByEmail(c.Context(), authParams.Email)
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {

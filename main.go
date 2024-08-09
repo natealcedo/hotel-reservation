@@ -41,7 +41,7 @@ func main() {
 	// handlers
 	userHandler := api.NewUserHandler(store.User)
 	hotelHandler := api.NewHotelHandler(store)
-	authHandler := api.NewAuthHandler(store)
+	authHandler := api.NewAuthHandler(store.User)
 
 	// Auth
 	auth.Post("/auth", authHandler.HandleAuthenticate)
