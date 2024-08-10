@@ -29,9 +29,10 @@ func main() {
 	}
 
 	store := &db.Store{
-		User:  db.NewMongoUserStore(client),
-		Hotel: db.NewMongoHotelStore(client),
-		Room:  db.NewMongoRoomStore(client, db.NewMongoHotelStore(client)),
+		User:    db.NewMongoUserStore(client),
+		Hotel:   db.NewMongoHotelStore(client),
+		Room:    db.NewMongoRoomStore(client, db.NewMongoHotelStore(client)),
+		Booking: db.NewMongoBookingStore(client),
 	}
 
 	app := fiber.New(config)
