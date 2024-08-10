@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
@@ -44,15 +43,17 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		})
 	}
 
-	booking := types.Booking{
+	insertedBooking, err := h.Booking.InsertBooking(c.Context(), &types.Booking{
 		UserID:     user.ID,
 		RoomID:     roomId,
 		NumPersons: params.NumPersons,
 		FromDate:   params.FromDate,
 		TillDate:   params.TillDate,
+	})
+
+	if err != nil {
+		return err
 	}
 
-	fmt.Printf("%+v\n", booking)
-
-	return nil
+	return c.Status(fiber.StatusCreated).JSON(insertedBooking)
 }
