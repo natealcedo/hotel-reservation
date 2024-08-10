@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
@@ -59,22 +60,13 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		})
 	}
 
-	where := bson.M{
-		"roomId": roomId,
-		"fromDate": bson.M{
-			"$gte": params.FromDate,
-		},
-		"tillDate": bson.M{
-			"$lte": params.TillDate,
-		},
-	}
-	bookings, err := h.Store.Booking.GetBookings(c.Context(), where)
+	ok, err = h.isRoomAvailableForBooking(c.Context(), roomId, params)
 
 	if err != nil {
 		return err
 	}
 
-	if len(bookings) > 0 {
+	if !ok {
 		return c.Status(fiber.StatusBadRequest).JSON(genericResponse{
 			Type: "error",
 			Msg:  fmt.Sprintf("room %s is already booked", roomId.Hex()),
@@ -94,4 +86,25 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(insertedBooking)
+}
+
+func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomId primitive.ObjectID, params BookRoomParams) (bool, error) {
+	where := bson.M{
+		"roomID": roomId,
+		"fromDate": bson.M{
+			"$gte": params.FromDate,
+		},
+		"tillDate": bson.M{
+			"$lte": params.TillDate,
+		},
+	}
+
+	bookings, err := h.Store.Booking.GetBookings(ctx, where)
+
+	if err != nil {
+		return false, err
+	}
+
+	ok := len(bookings) == 0
+	return ok, nil
 }
