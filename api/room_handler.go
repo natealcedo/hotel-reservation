@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
@@ -55,6 +56,28 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(genericResponse{
 			Msg:  "internal server error",
 			Type: "error",
+		})
+	}
+
+	where := bson.M{
+		"roomId": roomId,
+		"fromDate": bson.M{
+			"$gte": params.FromDate,
+		},
+		"tillDate": bson.M{
+			"$lte": params.TillDate,
+		},
+	}
+	bookings, err := h.Store.Booking.GetBookings(c.Context(), where)
+
+	if err != nil {
+		return err
+	}
+
+	if len(bookings) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(genericResponse{
+			Type: "error",
+			Msg:  fmt.Sprintf("room %s is already booked", roomId.Hex()),
 		})
 	}
 
