@@ -36,12 +36,13 @@ func main() {
 
 	app := fiber.New(config)
 	auth := app.Group("/api")
-	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication)
+	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication(store.User))
 
 	// handlers
 	userHandler := api.NewUserHandler(store.User)
 	hotelHandler := api.NewHotelHandler(store)
 	authHandler := api.NewAuthHandler(store.User)
+	roomHandler := api.NewRoomHandler(store)
 
 	// Auth
 	auth.Post("/auth", authHandler.HandleAuthenticate)
@@ -57,6 +58,7 @@ func main() {
 	apiV1.Get("/hotels", hotelHandler.HandleGetHotels)
 	apiV1.Get("/hotels/:id", hotelHandler.HandleGetHotelById)
 	apiV1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
+	apiV1.Post("/hotels/:id/rooms", roomHandler.HandleBookRoom)
 
 	err = app.Listen(*listenAddr)
 
