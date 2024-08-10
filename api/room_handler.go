@@ -108,3 +108,12 @@ func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomId prim
 	ok := len(bookings) == 0
 	return ok, nil
 }
+
+func (h *RoomHandler) HandleGetRooms(c *fiber.Ctx) error {
+	rooms, err := h.Store.Room.GetRooms(c.Context(), nil)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(rooms)
+}
