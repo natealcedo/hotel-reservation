@@ -59,7 +59,10 @@ func main() {
 	apiV1.Get("/hotels", hotelHandler.HandleGetHotels)
 	apiV1.Get("/hotels/:id", hotelHandler.HandleGetHotelById)
 	apiV1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
-	apiV1.Post("/hotels/:id/book", roomHandler.HandleBookRoom)
+
+	// Rooms
+	apiV1.Get("/rooms", roomHandler.HandleGetRooms)
+	apiV1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
 
 	err = app.Listen(*listenAddr)
 
