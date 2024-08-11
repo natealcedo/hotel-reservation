@@ -67,10 +67,10 @@ func main() {
 	apiV1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
 
 	// Bookings
-	admin.Get("/bookings/:id", bookingHandler.HandleGetBookingByID)
+	apiV1.Get("/bookings/:id", bookingHandler.HandleGetBookingByID)
 
 	// Admins
-	apiV1.Get("/bookings", bookingHandler.HandleGetBookings)
+	admin.Get("/bookings", bookingHandler.HandleGetBookings)
 
 	err = app.Listen(*listenAddr)
 
