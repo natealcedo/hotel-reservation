@@ -62,7 +62,7 @@ func (s *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*typ
 	}
 
 	var booking types.Booking
-	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&booking); err != nil {
+	if err = s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&booking); err != nil {
 		return nil, err
 	}
 

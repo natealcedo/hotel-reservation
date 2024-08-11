@@ -44,6 +44,7 @@ func main() {
 	hotelHandler := api.NewHotelHandler(store)
 	authHandler := api.NewAuthHandler(store.User)
 	roomHandler := api.NewRoomHandler(store)
+	bookingHandler := api.NewBookingHandler(store)
 
 	// Auth
 	auth.Post("/auth", authHandler.HandleAuthenticate)
@@ -63,6 +64,10 @@ func main() {
 	// Rooms
 	apiV1.Get("/rooms", roomHandler.HandleGetRooms)
 	apiV1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
+
+	// Bookings
+	apiV1.Get("/bookings", bookingHandler.HandleGetBookings)
+	apiV1.Get("/bookings/:id", bookingHandler.HandleGetBookingByID)
 
 	err = app.Listen(*listenAddr)
 
