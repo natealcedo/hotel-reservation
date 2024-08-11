@@ -64,7 +64,7 @@ func (params CreateUserParams) Validate() map[string]string {
 	}
 
 	if !isValidEmail(params.Email) {
-		errors["email"] = "email address is not valid"
+		errors["email"] = fmt.Sprintf("email address %s is not valid", params.Email)
 	}
 
 	return errors
