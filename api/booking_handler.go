@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
+	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
 )
@@ -24,7 +25,6 @@ func NewBookingHandler(store *db.Store) *BookingHandler {
 	}
 }
 
-// TODO: This needs to be admin authorized
 func (h *BookingHandler) HandleGetBookings(ctx *fiber.Ctx) error {
 	var params GetBookingsQueryParams
 	if err := ctx.QueryParser(&params); err != nil {
@@ -62,7 +62,6 @@ func (h *BookingHandler) HandleGetBookings(ctx *fiber.Ctx) error {
 	return ctx.JSON(bookings)
 }
 
-// TODO: This needs to be user authorized - only the user who made the booking can see it
 func (h *BookingHandler) HandleGetBookingByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -70,6 +69,19 @@ func (h *BookingHandler) HandleGetBookingByID(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		return err
+	}
+
+	user, ok := ctx.Context().Value("user").(*types.User)
+
+	if !ok {
+		return err
+	}
+
+	if booking.UserID != user.ID {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(genericResponse{
+			Type: "error",
+			Msg:  "not authorized",
+		})
 	}
 
 	return ctx.JSON(booking)
