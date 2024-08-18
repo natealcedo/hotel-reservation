@@ -68,6 +68,7 @@ func main() {
 
 	// Bookings
 	apiV1.Get("/bookings/:id", bookingHandler.HandleGetBookingByID)
+	apiV1.Get("/bookings/:id/cancel", bookingHandler.UpdateBookingByID)
 
 	// Admins
 	admin.Get("/bookings", bookingHandler.HandleGetBookings)
