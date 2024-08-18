@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/natealcedo/hotel-reservation/api"
 	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -36,6 +38,7 @@ func seedUser(first, last, email string, isAdmin bool) {
 		log.Fatal(err)
 	}
 
+	fmt.Printf("\n%s -> %s\n", email, api.CreateTokenFromUser(user))
 }
 
 func seedHotel(name, location string, rating int) {
@@ -82,7 +85,8 @@ func main() {
 	seedHotel("Don't die in your sleep", "London", 3)
 	seedUser("Nate", "Alcedo", "natealcedo@gmail.com", false)
 	seedUser("Lebron", "James", "lebron@gmail.com", false)
-	seedUser("Bronny", "James", "bronny@gmail.com", true)
+	seedUser("Bronny", "James", "bronny@gmail.com", false)
+	seedUser("Admin", "Admin", "admin@admin.com", true)
 }
 
 func init() {
