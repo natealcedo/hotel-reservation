@@ -93,9 +93,9 @@ func seedBooking(userID, roomID primitive.ObjectID, from, till time.Time) {
 func main() {
 	seedUser("Nate", "Alcedo", "natealcedo@gmail.com", false)
 	seedUser("Lebron", "James", "lebron@gmail.com", false)
-	seedUser("Bronny", "James", "bronny@gmail.com", false)
+	user := seedUser("Bronny", "James", "bronny@gmail.com", false)
 
-	user := seedUser("Admin", "Admin", "admin@admin.com", true)
+	seedUser("Admin", "Admin", "admin@admin.com", true)
 
 	seedHotel("Bellucia", "France", 5)
 	seedHotel("The cozy hotel", "Netherlands", 4)

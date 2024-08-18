@@ -28,4 +28,7 @@ fix:
 	@gofmt -w .
 
 seed:
-	@go run scripts/main.go
+	@go run scripts/seed/main.go
+
+drop:
+	@go run scripts/drop/main.go
