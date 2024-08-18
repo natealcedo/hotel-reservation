@@ -98,7 +98,7 @@ func (h *BookingHandler) UpdateBookingByID(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	if booking.UserID != user.ID || !user.IsAdmin {
+	if booking.UserID != user.ID && !user.IsAdmin {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(genericResponse{
 			Type: "error",
 			Msg:  "not authorized",
