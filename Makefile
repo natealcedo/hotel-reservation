@@ -3,11 +3,9 @@
 APP_NAME = app
 BIN = bin/$(APP_NAME)
 
-include .env
-export $(shell sed 's/=.*//' .env)
 
 run:
-	@go run main.go
+	@(JWT_SECRET=SECRET go run main.go)
 
 install:
 	@go mod tidy
@@ -19,7 +17,7 @@ clean:
 	@rm -rf bin/*
 
 test:
-	@go test -v ./... -count=1 # -count=1 to avoid caching
+	@(ENV=test go test -v ./... -count=1) # -count=1 to avoid caching
 
 lint:
 	@gofmt -l .
