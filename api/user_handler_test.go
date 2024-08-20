@@ -2,47 +2,19 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/natealcedo/hotel-reservation/db"
 	"github.com/natealcedo/hotel-reservation/types"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"net/http/httptest"
 	"testing"
 )
-
-type testDb struct {
-	db.UserStore
-}
-
-func setup(t *testing.T) *testDb {
-	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(db.DBURI))
-
-	if err != nil {
-		t.Fatalf("failed to connect to mongo: %v", err)
-	}
-
-	return &testDb{
-		UserStore: db.NewMongoUserStore(client),
-	}
-
-}
-
-func (testingDb *testDb) tearDown(t *testing.T) {
-	if err := testingDb.UserStore.Drop(context.Background()); err != nil {
-		t.Fatal(err)
-	}
-}
 
 func TestHandlePostUser(t *testing.T) {
 	testingDb := setup(t)
 	defer testingDb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(testingDb.UserStore)
+	userHandler := NewUserHandler(testingDb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := types.CreateUserParams{
@@ -102,7 +74,7 @@ func TestHandleGetUsers(t *testing.T) {
 	defer testingDb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(testingDb.UserStore)
+	userHandler := NewUserHandler(testingDb.User)
 	app.Get("/", userHandler.HandleGetUsers)
 
 	req := httptest.NewRequest("GET", "/", nil)
@@ -133,7 +105,7 @@ func TestHandleGetUserById(t *testing.T) {
 	defer testingDb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(testingDb.UserStore)
+	userHandler := NewUserHandler(testingDb.User)
 	app.Post("/", userHandler.HandlePostUser)
 	app.Get("/:id", userHandler.HandleGetUserById)
 
@@ -189,7 +161,7 @@ func TestHandleDeleteUserById(t *testing.T) {
 	defer testingDb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(testingDb.UserStore)
+	userHandler := NewUserHandler(testingDb.User)
 	app.Post("/", userHandler.HandlePostUser)
 	app.Get("/:id", userHandler.HandleGetUserById)
 	app.Delete("/:id", userHandler.HandleDeleteUserById)
@@ -244,7 +216,7 @@ func TestHandlePutUserById(t *testing.T) {
 	defer testingDb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(testingDb.UserStore)
+	userHandler := NewUserHandler(testingDb.User)
 	app.Post("/", userHandler.HandlePostUser)
 	app.Get("/:id", userHandler.HandleGetUserById)
 	app.Put("/:id", userHandler.HandlePutUserById)
