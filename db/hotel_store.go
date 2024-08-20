@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"github.com/natealcedo/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,8 +9,6 @@ import (
 )
 
 type HotelStore interface {
-	Dropper
-
 	InsertHotel(context.Context, *types.Hotel) (*types.Hotel, error)
 	UpdateHotel(context.Context, bson.M, bson.M) error
 	GetHotels(context.Context, bson.M) ([]*types.Hotel, error)
@@ -39,11 +36,6 @@ func (s *MongoHotelStore) InsertHotel(ctx context.Context, hotel *types.Hotel) (
 
 	hotel.ID = resp.InsertedID.(primitive.ObjectID)
 	return hotel, nil
-}
-
-func (s *MongoHotelStore) Drop(ctx context.Context) error {
-	fmt.Printf("---- Dropping %s collection ----\n", s.coll.Name())
-	return s.coll.Drop(ctx)
 }
 
 func (s *MongoHotelStore) UpdateHotel(ctx context.Context, filter, update bson.M) error {

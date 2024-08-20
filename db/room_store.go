@@ -10,8 +10,6 @@ import (
 )
 
 type RoomStore interface {
-	Dropper
-
 	InsertRoom(context.Context, *types.Room) (*types.Room, error)
 	GetRooms(context.Context, bson.M) ([]*types.Room, error)
 }

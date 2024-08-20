@@ -9,13 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Dropper interface {
-	Drop(context.Context) error
-}
-
 type UserStore interface {
-	Dropper
-
 	GetUserById(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
