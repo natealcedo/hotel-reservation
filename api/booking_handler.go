@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/natealcedo/hotel-reservation/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -29,8 +28,6 @@ func (h *BookingHandler) HandleGetBookings(ctx *fiber.Ctx) error {
 	if err := ctx.QueryParser(&params); err != nil {
 		return err
 	}
-
-	fmt.Println(params.FromDate)
 
 	filter := bson.M{}
 
