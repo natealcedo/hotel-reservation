@@ -39,7 +39,7 @@ func TestHandleAuthenticate(t *testing.T) {
 	var authResponse AuthResponse
 
 	if expected != actual {
-		t.Errorf("expected %v but got %v", expected, actual)
+		t.Errorf("expected %d but got %d", expected, actual)
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&authResponse); err != nil {
@@ -60,15 +60,15 @@ func TestHandleAuthenticate(t *testing.T) {
 func TestHandleAuthenticateFailure(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.tearDown(t)
-	fixtures.AddUser(tdb.Store, "Nate", "Alcedo", false)
+	fixtures.AddUser(tdb.Store, "nate", "alcedo", false)
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
-		Email:    "natealcedo@gmail.com",
-		Password: "wrong password",
+		Email:    "nate@alcedo.com",
+		Password: "wrong_password",
 	}
 
 	b, _ := json.Marshal(params)
@@ -85,7 +85,7 @@ func TestHandleAuthenticateFailure(t *testing.T) {
 	actual := res.StatusCode
 
 	if expected != actual {
-		t.Errorf("expected %v but got %v", expected, actual)
+		t.Errorf("expected %d but got %d", expected, actual)
 	}
 
 	var genResp genericResponse
@@ -94,11 +94,11 @@ func TestHandleAuthenticateFailure(t *testing.T) {
 	}
 
 	if genResp.Type != "error" {
-		t.Fatalf("expected %v but got %v", "error", genResp.Type)
+		t.Fatalf("expected %s but got %s", "error", genResp.Type)
 	}
 
 	if genResp.Msg != invalidCredentialsMsg {
-		t.Fatalf("expected %v but got %v", invalidCredentialsMsg, genResp.Msg)
+		t.Fatalf("expected %s but got %s", invalidCredentialsMsg, genResp.Msg)
 	}
 
 }

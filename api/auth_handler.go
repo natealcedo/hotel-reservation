@@ -40,7 +40,7 @@ type genericResponse struct {
 }
 
 func invalidCredentials(c *fiber.Ctx) error {
-	return c.Status(401).JSON(
+	return c.Status(fiber.StatusUnauthorized).JSON(
 		genericResponse{
 			Type: "error",
 			Msg:  invalidCredentialsMsg,
